@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.FileCopyUtils;
@@ -26,6 +27,43 @@ import net.coobird.thumbnailator.Thumbnailator;
 @Controller
 @Log4j
 public class UploadController {
+	
+	@GetMapping(value="/download/{fileName}", produces= {MediaType.APPLICATION_OCTET_STREAM_VALUE})
+	@ResponseBody
+	public ResponseEntity<byte[]> download(@PathVariable("fileName") String fileName){
+		
+		String fName = fileName.substring(0, fileName.lastIndexOf("_")); 
+		log.info("FName: " + fName);
+		
+		String ext = fileName.substring(fileName.lastIndexOf("_")+ 1);
+		log.info("ext: " + ext);
+		
+		String total = fName + "." + ext;
+		
+		int under = total.indexOf("_");
+		
+		String totalOrigin = total.substring(under+1);
+		
+		ResponseEntity<byte[]> result = null;
+
+		try {
+
+			File target = new File("C:\\upload\\" + total);
+			
+			String downName = new String(totalOrigin.getBytes("UTF-8"),"ISO-8859-1");
+			
+			HttpHeaders header = new HttpHeaders();
+			header.add("Content-Disposition", "attachment; filename="+ downName);
+
+			byte[] arr = FileCopyUtils.copyToByteArray(target);
+			result = new ResponseEntity<>(arr, header, HttpStatus.OK);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return result;
+	}
 	
 	@GetMapping("/viewFile/{fileName}")
 	@ResponseBody
