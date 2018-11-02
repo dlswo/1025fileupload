@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.injae.mapper.BoardAttachMapper">
+
+	<insert id="insert">
+		insert into tbl_upload (uuid, path, filename, filetype, bno)
+		values (#{uuid}, #{path}, #{filename}, #{filetype}, #{bno})
+	</insert>
+	
+	<delete id="delete">
+		delete from tbl_upload where uuid = #{uuid}
+	</delete>
+	
+	<select id="findByBno" resultType="org.injae.domain.BoardAttachVO">
+		select * from tbl_upload where bno = #{bno}
+	</select>
+	
+	<delete id="deleteAll">
+		delete from tbl_upload where bno = #{bno}
+	</delete>
+
+</mapper>
