@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+		http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+	<bean id="customAccessDenied" class="org.injae.security.CustomAccessDeniedHandler"></bean>
+	<bean id="customLoginSuccess" class="org.injae.security.CustomLoginSuccessHandler"></bean>
+	<bean id="customLoginFail" class="org.injae.security.CustomLoginFailureHandler"></bean>
+	<bean id="customLogout" class="org.injae.security.CustomLogoutHandler"></bean>
+	<bean id="customPasswordEncoder" class="org.injae.security.CustomNoOpPasswordEncoder"></bean>
+
+	<security:http>
+		<security:intercept-url pattern="/sample/all" access="permitAll"/>
+		
+		<security:intercept-url pattern="/sample/member" access="hasRole('ROLE_MANAGER')"/>
+		
+		<security:intercept-url pattern="/sample/admin" access="hasRole('ROLE_ADMIN')"/>
+	
+		<security:form-login login-page="/customLogin" 
+			authentication-success-handler-ref="customLoginSuccess"
+			authentication-failure-handler-ref="customLoginFail"/>
+			
+		<security:logout logout-url="/customLogout"
+			success-handler-ref="customLogout"/>
+		
+		<!-- <security:access-denied-handler error-page="/accessError"/> -->
+		<security:access-denied-handler ref="customAccessDenied"/>
+		
+	</security:http>
+	
+	<security:authentication-manager>
+		<security:authentication-provider>
+			<security:jdbc-user-service data-source-ref="dataSource"/>
+			<security:password-encoder ref="customPasswordEncoder"/>
+		</security:authentication-provider>
+	</security:authentication-manager>
+	
+	<context:component-scan base-package="org.zerock.security"></context:component-scan>	
+
+</beans>
+
